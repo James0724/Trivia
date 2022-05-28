@@ -1,3 +1,5 @@
+node_modules
+triviaenv
 .vscode
 __pycache__
 venv
