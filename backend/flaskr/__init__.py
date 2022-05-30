@@ -38,7 +38,6 @@ def create_app(test_config=None):
     def retrieve_categories():
         categories = [category.format() for category in Category.query.all()]
 
-        #print(Category.query.all())
         return jsonify(
             {
                 "success": True,
@@ -171,7 +170,6 @@ def create_app(test_config=None):
         questions = category.questions
 
         current_questions = paginate_questions(request, questions) # I am always returning a paginated_questions incase they are more than 10 questions
-        print(current_questions)
         if len(current_questions) == 0: # when no question in a category is found in the database
             abort(404)
         

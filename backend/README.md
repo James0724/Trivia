@@ -371,7 +371,7 @@ json formart of a randomly seleceted question is as follows:
 }
 ```
 
-`GET '/api/v1.0/quizzes/<int:category_id>'`
+`GET '/api/v1.0/quizzes'`
 
 - get random quizzes from all category randomly
 - Request Arguments: none
