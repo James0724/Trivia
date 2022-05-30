@@ -77,5 +77,5 @@ class Category(db.Model):
             'id': self.id,
             'type': self.type
             }
-    # def __repr__(self):
-    #     return f'{self.id}:{self.type}'
+    def __repr__(self):
+        return f'{self.id}:{self.type}'
