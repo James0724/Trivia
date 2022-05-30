@@ -3,19 +3,15 @@ from sqlalchemy.orm import relationship
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
-
-database_name = 'trivia'
-database_path = 'postgresql://postgres:kacool@localhost:5432/trivia'
-
 db = SQLAlchemy()
 
-
+database_path = 'postgresql://postgres:kacool@localhost:5432/trivia'
 """
 setup_db(app)
     binds a flask application and a SQLAlchemy service
 """
-def setup_db(app, database_path=database_path):
-    app.config["SQLALCHEMY_DATABASE_URI"] = database_path
+def setup_db(app, dbpath=database_path):
+    app.config["SQLALCHEMY_DATABASE_URI"] = dbpath 
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config['FLASK_DEBUG'] = True
     db.app = app

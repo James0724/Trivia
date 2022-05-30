@@ -25,25 +25,19 @@ class QuestionView extends Component {
 	getQuestions = () => {
 		axios
 			.all([
-				axios.get("/categories").then((res) => {
+				axios.get("/api/v1.0/categories").then((res) => {
 					const categories = res.data;
-					//console.log(categories);
-					//console.log(categories.categories);
 					this.setState({
 						categories: categories.categories,
 					});
 				}),
-				axios.get(`/questions?page=${this.state.page}`).then((res) => {
+				axios.get(`/api/v1.0/questions?page=${this.state.page}`).then((res) => {
 					const question = res.data;
-					//console.log(question);
-					//console.log(question.Question);
 					this.setState({
 						questions: question.Question,
 						totalQuestions: question.total_questions,
 						currentCategory: question.current_category,
 					});
-
-					//console.log(this.state);
 				}),
 			])
 			.catch(function (error) {
@@ -91,7 +85,7 @@ class QuestionView extends Component {
 
 	getByCategory = (id) => {
 		axios
-			.get(`/categories/${id}`)
+			.get(`/api/v1.0/categories/${id}`)
 			.then((res) => {
 				const category = res.data;
 				this.setState({
@@ -122,7 +116,7 @@ class QuestionView extends Component {
 	submitSearch = (searchTerm) => {
 		axios
 			.post(
-				"/search/questions",
+				"/api/v1.0/search/questions",
 				{
 					data: { search_term: searchTerm },
 				},
@@ -173,7 +167,7 @@ class QuestionView extends Component {
 		if (action === "DELETE") {
 			if (window.confirm("are you sure you want to delete the question?")) {
 				axios
-					.delete(`/questions/${id}`)
+					.delete(`/api/v1.0/questions/${id}`)
 					.then((res) => {
 						alert("Question succesfully deleted");
 						this.getQuestions();

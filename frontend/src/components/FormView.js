@@ -16,7 +16,7 @@ class FormView extends Component {
 	}
 
 	componentDidMount() {
-		axios.get("/categories").then((res) => {
+		axios.get("/api/v1.0/categories").then((res) => {
 			const categories = res.data;
 			this.setState({
 				categories: categories.categories,
@@ -28,7 +28,7 @@ class FormView extends Component {
 		event.preventDefault();
 		axios
 			.post(
-				"/questions",
+				"/api/v1.0/questions",
 				{
 					data: {
 						question: this.state.question,
@@ -53,6 +53,7 @@ class FormView extends Component {
 			)
 			.then((res) => {
 				alert("Question added successfully ");
+				console.log(res);
 				return res;
 			})
 			.catch(function (error) {

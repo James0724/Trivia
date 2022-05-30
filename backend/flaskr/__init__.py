@@ -2,6 +2,7 @@ import json
 from flask import Flask, request, abort, jsonify
 from flask_cors import CORS, cross_origin
 import random
+from flask_sqlalchemy import Model
 
 from sqlalchemy import JSON
 
@@ -33,7 +34,7 @@ def create_app(test_config=None):
         return response
 
     #GET ALL CATEGORIES
-    @app.route("/categories")
+    @app.route("/api/v1.0/categories")
     def retrieve_categories():
         categories = [category.format() for category in Category.query.all()]
 
@@ -47,13 +48,12 @@ def create_app(test_config=None):
         )
 
     #GET ALL CATEGORY BY ID
-    @app.route('/categories/<int:category_id>')
+    @app.route('/api/v1.0/categories/<int:category_id>')
     def get_category_by_id(category_id):
         category = Category.query.get(category_id)
         category_questions = Question.query.filter_by(category_id = category_id).all()
         question = [question.format() for question in category_questions]
 
-        print(category.questions)
         return jsonify(
             {
                 "success": True,
@@ -66,7 +66,7 @@ def create_app(test_config=None):
 
 
     #GET ALL QUESTIONS 10 PER PAGE
-    @app.route("/questions")
+    @app.route("/api/v1.0/questions")
     def retrieve_questions():
         questions = Question.query.order_by(Question.id).all()
         current_questions = paginate_questions(request, questions)
@@ -83,7 +83,7 @@ def create_app(test_config=None):
         )
 
     #DELETE A QUESTION PERMANENTLY
-    @app.route("/questions/<int:question_id>", methods=["DELETE"])
+    @app.route("/api/v1.0/questions/<int:question_id>", methods=["DELETE"])
     def delete_book(question_id):
         try:
             question = Question.query.filter(Question.id == question_id).one_or_none()
@@ -108,20 +108,19 @@ def create_app(test_config=None):
             abort(422)
 
     #POST A QUESTION AND LIST IT AT THE END OF THE LAST PAGE
-    @app.route("/questions", methods=["POST"])
-    @cross_origin(origin='*',headers=['Content-Type'])
+    @app.route("/api/v1.0/questions", methods=["POST"])
     def create_new_question():
-        body = request.get_json()
+        body = json.loads(request.data)
         
         new_question = body['data']['question']
         difficulty_level = body['data']['difficulty']
         category_id = body['data']['category_id']
         the_answer = body['data']['answer']
-        
 
         try:
             question = Question(question=new_question, difficulty=difficulty_level, category_id=category_id, answer=the_answer)
             question.insert()
+            
 
             questions= Question.query.order_by(Question.id).all()
             current_questions = paginate_questions(request, questions)
@@ -135,21 +134,27 @@ def create_app(test_config=None):
             )
 
         except:
-            abort(422)
+            return jsonify(
+                {"success": True, 
+                "error": 304, 
+                "message": "Not modified"
+                }
+                )
+
    
     #SEARCH QUESTIONS 
-    @app.route("/search/questions", methods=["POST"])
+    @app.route("/api/v1.0/search/questions", methods=["POST"])
     def search_questions():
         body = request.get_json()
 
         search_questions = body['data']['search_term']
-        print(search_questions)
+        
         questions = Question.query.filter(Question.question.ilike('%'+search_questions+'%')).all()
 
         if questions is None:
             return  {
                 "success": True,
-                "Questions_found": "no questions found nmatching search term",
+                "Questions_found": [],
                 "total_questions": 0,
             }
         current_questions = paginate_questions(request, questions)
@@ -160,7 +165,7 @@ def create_app(test_config=None):
             }
 
     #QUESTIONS BASED IN THE CATEGORY
-    @app.route("/categories/<int:category_id>", methods=['GET'])
+    @app.route("/api/v1.0/categories/<int:category_id>", methods=['GET'])
     def category_questions(category_id):
         category = Category.query.get(category_id)
         questions = category.questions
@@ -168,12 +173,7 @@ def create_app(test_config=None):
         current_questions = paginate_questions(request, questions) # I am always returning a paginated_questions incase they are more than 10 questions
         print(current_questions)
         if len(current_questions) == 0: # when no question in a category is found in the database
-            return jsonify(
-            {
-                "success": True,
-                "Question": 'No quesions in this category',
-                "total_questions": 0,
-            })
+            abort(404)
         
         return jsonify(
             {
@@ -182,19 +182,8 @@ def create_app(test_config=None):
                 "total_questions": len(questions),
             }
         )
-    """
-    @TODO:
-    Create a POST endpoint to get questions to play the quiz.
-    This endpoint should take category and previous question parameters
-    and return a random questions within the given category,
-    if provided, and that is not one of the previous questions.
-
-    TEST: In the "Play" tab, after a user selects "All" or a category,
-    one question at a time is displayed, the user is allowed to answer
-    and shown whether they were correct or not.
-    """
     #GET RANDOM QUIZZES
-    @app.route("/quizzes/<int:category_id>")
+    @app.route("/api/v1.0/quizzes/<int:category_id>")
     def get_random_quizzes_by_category(category_id):
         category = Category.query.get(category_id)
         #question =[question.format() for question in category.questions]
@@ -217,7 +206,7 @@ def create_app(test_config=None):
                 "id":question.id,   
             }
          )
-    @app.route("/quizzes")
+    @app.route("/api/v1.0/quizzes")
     def get_all_quizzes():
         questions = Question.query.all() #get all questions in the data base
         random_id_pool = []  # create a pool of id where to get a random question

@@ -25,26 +25,12 @@ class QuizView extends Component {
 	}
 
 	componentDidMount() {
-		axios.all([
-			axios.get("/categories").then((res) => {
-				const categories = res.data;
-				this.setState({
-					categories: categories.categories,
-				});
-				//console.log(this.state.categories);
-			}),
-			// axios
-			// 	.get("/quizzes")
-			// 	.then((res) => {
-			// 		const question = res.data;
-			// 		//console.log(question);
-			// 		//console.log(question.question);
-			// 		this.setState({
-			// 			currentQuestion: question.question,
-			// 		});
-			// 	})
-			// 	.catch(catch_errors()),
-		]);
+		axios.get("/api/v1.0/categories").then((res) => {
+			const categories = res.data;
+			this.setState({
+				categories: categories.categories,
+			});
+		});
 	}
 
 	componentDidUpdate(prevProp, prevState) {
@@ -64,11 +50,10 @@ class QuizView extends Component {
 			allCategory: true,
 		});
 		axios
-			.get("/quizzes")
+			.get("/api/v1.0/quizzes")
 			.then((res) => {
 				const question = res.data;
-				//console.log(question);
-				//console.log(question.Question);
+				console.log(question);
 				this.setState({
 					currentQuestion: question.question,
 					currentAnswer: question.answer,
@@ -103,7 +88,7 @@ class QuizView extends Component {
 			showAnswer: false,
 		});
 		axios
-			.get("/quizzes")
+			.get("/api/v1.0/quizzes")
 			.then((res) => {
 				const question = res.data;
 				//console.log(question);
@@ -140,9 +125,8 @@ class QuizView extends Component {
 	async getQuestion(props) {
 		var category_id = props;
 		let response = await axios
-			.get(`/quizzes/${category_id}`)
+			.get(`/api/v1.0/quizzes/${category_id}`)
 			.then((res) => {
-				//console.log(res);
 				return res;
 			})
 			.catch(function (error) {
@@ -181,7 +165,7 @@ class QuizView extends Component {
 		});
 		var category_id = this.state.quizCategory;
 		axios
-			.get(`/quizzes/${category_id}`)
+			.get(`/api/v1.0/quizzes/${category_id}`)
 			.then((res) => {
 				const question = res.data;
 				//console.log(question);
